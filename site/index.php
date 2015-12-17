@@ -11,15 +11,28 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
     exit; // Don't kill him :'(
 }
 
-$regions = array("USA", "EUR", "GER", "AUS", "JPN");
-$other_types = array("Homebrew", "Custom", "Templates", "Make" => "Make your own!");
+$regions = array(
+    "USA" => null,
+    "EUR" => null,
+    "GER" => null,
+    "AUS" => null,
+    "JPN" => null
+);
+
+$other_types = array(
+    "Homebrew" => null,
+    "Custom" => null,
+    "Templates" => null,
+    "Make" => "Make your own!"
+);
+
 $types = array_merge($regions, $other_types);
 if (isset($_GET["type"])) {
-    if (!in_array($_GET["type"], $types)) {
+    if (!array_key_exists($_GET["type"], $types)) {
         header("Location: https://".$_SERVER['HTTP_HOST']."/3dsflow/");
-        die;
+        exit; // Don't you dare kill him.
     }
-    $is_region = in_array($_GET['type'], $regions);
+    $is_region = array_key_exists($_GET['type'], $regions);
 }
 
 function listImages($dir) {
