@@ -81,15 +81,14 @@ function listImages($dir) {
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li<?php if ($_GET["type"] == "USA") echo ' class="active"'; ?>><a href="?type=USA">USA</a></li>
-                    <li<?php if ($_GET["type"] == "EUR") echo ' class="active"'; ?>><a href="?type=EUR">EUR</a></li>
-                    <li<?php if ($_GET["type"] == "GER") echo ' class="active"'; ?>><a href="?type=GER">GER</a></li>
-                    <li<?php if ($_GET["type"] == "AUS") echo ' class="active"'; ?>><a href="?type=AUS">AUS</a></li>
-                    <li<?php if ($_GET["type"] == "JPN") echo ' class="active"'; ?>><a href="?type=JPN">JPN</a></li>
-                    <li<?php if ($_GET["type"] == "Homebrew") echo ' class="active"'; ?>><a href="?type=Homebrew">Homebrew</a></li>
-                    <li<?php if ($_GET["type"] == "Custom") echo ' class="active"'; ?>><a href="?type=Custom">Custom</a></li>
-                    <li<?php if ($_GET["type"] == "Templates") echo ' class="active"'; ?>><a href="?type=Templates">Templates</a></li>
-                    <li<?php if ($_GET["type"] == "Make") echo ' class="active"'; ?>><a href="?type=Make">Make your own!</a></li>
+                    <?php foreach ($regions as $region): ?>
+                        <li<?php if ($_GET["type"] === $region) echo ' class="active"'; ?>><a href="?type=<?= $region ?>"><?= $region ?></a></li>
+                    <?php endforeach; ?>
+                    
+                    <li<?php if ($_GET["type"] === "Homebrew") echo ' class="active"'; ?>><a href="?type=Homebrew">Homebrew</a></li>
+                    <li<?php if ($_GET["type"] === "Custom") echo ' class="active"'; ?>><a href="?type=Custom">Custom</a></li>
+                    <li<?php if ($_GET["type"] === "Templates") echo ' class="active"'; ?>><a href="?type=Templates">Templates</a></li>
+                    <li<?php if ($_GET["type"] === "Make") echo ' class="active"'; ?>><a href="?type=Make">Make your own!</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
