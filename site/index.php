@@ -12,7 +12,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
 }
 
 $regions = array("USA", "EUR", "GER", "AUS", "JPN");
-$other_types = array("Homebrew", "Custom", "Templates", "Make");
+$other_types = array("Homebrew", "Custom", "Templates", "Make" => "Make your own!");
 $types = array_merge($regions, $other_types);
 if (isset($_GET["type"])) {
     if (!in_array($_GET["type"], $types)) {
@@ -81,14 +81,13 @@ function listImages($dir) {
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <?php foreach ($regions as $region): ?>
-                        <li<?php if ($_GET["type"] === $region) echo ' class="active"'; ?>><a href="?type=<?= $region ?>"><?= $region ?></a></li>
+                    <?php foreach ($types as $type => $v): ?>
+                        <?php if (empty($v)): ?>
+                            <li<?php if ($_GET["type"] === $type) echo ' class="active"'; ?>><a href="?type=<?= $type ?>"><?= $type ?></a></li>
+                        <?php else: ?>
+                            <li<?php if ($_GET["type"] === $type) echo ' class="active"'; ?>><a href="?type=<?= $type ?>"><?= $v ?></a></li>
+                        <?php endif; ?>
                     <?php endforeach; ?>
-                    
-                    <li<?php if ($_GET["type"] === "Homebrew") echo ' class="active"'; ?>><a href="?type=Homebrew">Homebrew</a></li>
-                    <li<?php if ($_GET["type"] === "Custom") echo ' class="active"'; ?>><a href="?type=Custom">Custom</a></li>
-                    <li<?php if ($_GET["type"] === "Templates") echo ' class="active"'; ?>><a href="?type=Templates">Templates</a></li>
-                    <li<?php if ($_GET["type"] === "Make") echo ' class="active"'; ?>><a href="?type=Make">Make your own!</a></li>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
