@@ -8,7 +8,7 @@ if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
     $redirect = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: $redirect");
-    exit; // Don't kill him :'(
+    die;
 }
 
 $regions = array(
@@ -30,7 +30,7 @@ $types = array_merge($regions, $other_types);
 if (isset($_GET["type"])) {
     if (!array_key_exists($_GET["type"], $types)) {
         header("Location: https://".$_SERVER['HTTP_HOST']."/3dsflow/");
-        exit; // Don't you dare kill him.
+        die;
     }
     $is_region = array_key_exists($_GET['type'], $regions);
 }
