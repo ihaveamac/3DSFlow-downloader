@@ -8,11 +8,11 @@ if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
     $redirect = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: $redirect");
-    die;
+    exit; // Don't kill him :'(
 }
 
 $regions = array("USA", "EUR", "GER", "AUS", "JPN");
-$not_regions = array("Homebrew", "Custom", "Templates", "Make");
+$other_types = array("Homebrew", "Custom", "Templates", "Make");
 $types = array_merge($regions, $not_regions);
 if (isset($_GET["type"])) {
     if (!in_array($_GET["type"], $types)) {
