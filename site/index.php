@@ -4,20 +4,22 @@
 
 // most of this is probably a bad idea but it works so shut up unless you can make it better :)
 
-if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
     $redirect = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: $redirect");
-    die;
+    exit; // Don't kill him :'(
 }
 
-$types = array("USA", "EUR", "GER", "AUS", "JPN", "Homebrew", "Custom", "Templates", "Make");
+$regions = array("USA", "EUR", "GER", "AUS", "JPN");
+$other_types = array("Homebrew", "Custom", "Templates", "Make");
+$types = array_merge($regions, $other_types);
 if (isset($_GET["type"])) {
     if (!in_array($_GET["type"], $types)) {
         header("Location: https://".$_SERVER['HTTP_HOST']."/3dsflow/");
         die;
     }
-    $is_region = $_GET["type"] == "USA" || $_GET["type"] == "EUR" || $_GET["type"] == "GER" || $_GET["type"] == "AUS" || $_GET["type"] == "JPN";
+    $is_region = in_array($_GET['type'], $regions);
 }
 
 function listImages($dir) {
