@@ -82,7 +82,7 @@ function listImages($dir) {
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <?php foreach ($types as $type => $v): ?>
-                        <?php if (empty($v)): ?>
+                        <?php if (!isset($v) || empty($v)): ?>
                             <li<?php if ($_GET["type"] === $type) echo ' class="active"'; ?>><a href="?type=<?= $type ?>"><?= $type ?></a></li>
                         <?php else: ?>
                             <li<?php if ($_GET["type"] === $type) echo ' class="active"'; ?>><a href="?type=<?= $type ?>"><?= $v ?></a></li>
