@@ -14,7 +14,7 @@
                 <option value="template-basic-banner-fullscreen.png">Generic</option>
                 <option value="template-new-banner-fullscreen.png" data-offset-x="10" data-offset-y="10" disabled>Generic New (Not available yet)</option>
                 <option value="template-nnetwork-banner-fullscreen.png">Nintendo Network</option>
-                <option value="template-amiibo-banner-fullscreen.png">amiibo</option>
+                <option value="template-amiibo-banner-fullscreen.png">-̗̀  amiibo  ̖́-</option>
                 <option value="template-eshop-banner-fullscreen.png">Nintendo eShop</option>
             </optgroup>
             <optgroup label="Virtual Console">
