@@ -1,7 +1,8 @@
 <?php
 // this is @Gocario's work, licensed under the MIT license
 // see `LICENSE.md` at project root for details
-?><div>
+?>
+<div>
     <canvas id="canvasPreview" width="400px" height="222px">No canvas? That's sad...</canvas>
     <p>Please, right click on the preview to download it.</p>
 </div>
@@ -18,7 +19,8 @@
             </optgroup>
             <optgroup label="Virtual Console">
                 <option value="template-VC-generic-banner-fullscreen.png">Generic/Other</option>
-                <option value="template-VC-GB-banner-fullscreen.png">Game Boy &amp; Game Boy Color</option>
+                <option value="template-VC-GB-banner-fullscreen.png">Game Boy</option>
+                <option value="template-VC-GBC-banner-fullscreen.png">Game Boy Color</option>
                 <option value="template-VC-GBA-banner-fullscreen.png">Game Boy Advance</option>
                 <option value="template-VC-NES-banner-fullscreen.png">Nintendo Entertainment System</option>
                 <option value="template-VC-SNES-banner-fullscreen.png">Super NES</option>
@@ -31,7 +33,7 @@
         </select>
         <input type="button" id="coverGame" name="coverGame" value="Load a cover">
         <input type="button" id="importCoverGame" name="importCoverGame" value="Import a cover">
-        <!-- TODO: The template selector of the import -->
+        <!-- TODO: The template selector of the import because of the data-offset- -->
     </div>
     <div>
         <label><input type="checkbox" id="demoCheck" name="demoCheck">&nbsp;Add the demo logo</label>
