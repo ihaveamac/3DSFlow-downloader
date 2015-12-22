@@ -29,6 +29,7 @@
             <optgroup label="Other">
                 <option value="template-system-banner-fullscreen.png">System</option>
                 <option value="template-hb-banner-fullscreen.png">Homebrew</option>
+                <option value="template-cfw-banner-fullscreen.png">Custome Firmware</option>
             </optgroup>
         </select>
         <input type="button" id="coverGame" name="coverGame" value="Load a cover">
