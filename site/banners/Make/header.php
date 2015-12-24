@@ -1,7 +1,8 @@
 <?php
 // this is @Gocario's work, licensed under the MIT license
 // see `LICENSE.md` at project root for details
-?><div>
+?>
+<div>
     <canvas id="canvasPreview" width="400px" height="222px">No canvas? That's sad...</canvas>
     <p>Please, right click on the preview to download it.</p>
 </div>
@@ -13,12 +14,13 @@
                 <option value="template-basic-banner-fullscreen.png">Generic</option>
                 <option value="template-new-banner-fullscreen.png" data-offset-x="10" data-offset-y="10" disabled>Generic New (Not available yet)</option>
                 <option value="template-nnetwork-banner-fullscreen.png">Nintendo Network</option>
-                <option value="template-amiibo-banner-fullscreen.png">amiibo</option>
+                <option value="template-amiibo-banner-fullscreen.png">-̗̀  amiibo  ̖́-</option>
                 <option value="template-eshop-banner-fullscreen.png">Nintendo eShop</option>
             </optgroup>
             <optgroup label="Virtual Console">
                 <option value="template-VC-generic-banner-fullscreen.png">Generic/Other</option>
-                <option value="template-VC-GB-banner-fullscreen.png">Game Boy &amp; Game Boy Color</option>
+                <option value="template-VC-GB-banner-fullscreen.png">Game Boy</option>
+                <option value="template-VC-GBC-banner-fullscreen.png">Game Boy Color</option>
                 <option value="template-VC-GBA-banner-fullscreen.png">Game Boy Advance</option>
                 <option value="template-VC-NES-banner-fullscreen.png">Nintendo Entertainment System</option>
                 <option value="template-VC-SNES-banner-fullscreen.png">Super NES</option>
@@ -27,11 +29,12 @@
             <optgroup label="Other">
                 <option value="template-system-banner-fullscreen.png">System</option>
                 <option value="template-hb-banner-fullscreen.png">Homebrew</option>
+                <option value="template-cfw-banner-fullscreen.png">Custom Firmware</option>
             </optgroup>
         </select>
         <input type="button" id="coverGame" name="coverGame" value="Load a cover">
         <input type="button" id="importCoverGame" name="importCoverGame" value="Import a cover">
-        <!-- TODO: The template selector of the import -->
+        <!-- TODO: The template selector of the import because of the data-offset- -->
     </div>
     <div>
         <label><input type="checkbox" id="demoCheck" name="demoCheck">&nbsp;Add the demo logo</label>
