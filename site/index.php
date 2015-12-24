@@ -4,20 +4,35 @@
 
 // most of this is probably a bad idea but it works so shut up unless you can make it better :)
 
-if(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
+if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == ""){
     $redirect = "https://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     header("HTTP/1.1 301 Moved Permanently");
     header("Location: $redirect");
     die;
 }
 
-$types = array("USA", "EUR", "GER", "AUS", "JPN", "Homebrew", "Custom", "Templates", "Make");
+$regions = array(
+    "USA" => null,
+    "EUR" => null,
+    "GER" => null,
+    "AUS" => null,
+    "JPN" => null
+);
+
+$other_types = array(
+    "Homebrew" => null,
+    "Custom" => null,
+    "Templates" => null,
+    "Make" => "Make your own!"
+);
+
+$types = array_merge($regions, $other_types);
 if (isset($_GET["type"])) {
-    if (!in_array($_GET["type"], $types)) {
+    if (!array_key_exists($_GET["type"], $types)) {
         header("Location: https://".$_SERVER['HTTP_HOST']."/3dsflow/");
         die;
     }
-    $is_region = $_GET["type"] == "USA" || $_GET["type"] == "EUR" || $_GET["type"] == "GER" || $_GET["type"] == "AUS" || $_GET["type"] == "JPN";
+    $is_region = array_key_exists($_GET['type'], $regions);
 }
 
 function listImages($dir) {
@@ -79,15 +94,13 @@ function listImages($dir) {
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li<?php if ($_GET["type"] == "USA") echo ' class="active"'; ?>><a href="?type=USA">USA</a></li>
-                    <li<?php if ($_GET["type"] == "EUR") echo ' class="active"'; ?>><a href="?type=EUR">EUR</a></li>
-                    <li<?php if ($_GET["type"] == "GER") echo ' class="active"'; ?>><a href="?type=GER">GER</a></li>
-                    <li<?php if ($_GET["type"] == "AUS") echo ' class="active"'; ?>><a href="?type=AUS">AUS</a></li>
-                    <li<?php if ($_GET["type"] == "JPN") echo ' class="active"'; ?>><a href="?type=JPN">JPN</a></li>
-                    <li<?php if ($_GET["type"] == "Homebrew") echo ' class="active"'; ?>><a href="?type=Homebrew">Homebrew</a></li>
-                    <li<?php if ($_GET["type"] == "Custom") echo ' class="active"'; ?>><a href="?type=Custom">Custom</a></li>
-                    <li<?php if ($_GET["type"] == "Templates") echo ' class="active"'; ?>><a href="?type=Templates">Templates</a></li>
-                    <li<?php if ($_GET["type"] == "Make") echo ' class="active"'; ?>><a href="?type=Make">Make your own!</a></li>
+                    <?php foreach ($types as $k => $v): ?>
+                        <?php if (is_null($v)): ?>
+                            <li<?php if ($_GET["type"] === $k) echo ' class="active"'; ?>><a href="?type=<?= $k ?>"><?= $k ?></a></li>
+                        <?php else: ?>
+                            <li<?php if ($_GET["type"] === $k) echo ' class="active"'; ?>><a href="?type=<?= $k ?>"><?= $v ?></a></li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
