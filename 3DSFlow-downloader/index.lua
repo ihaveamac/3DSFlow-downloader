@@ -7,6 +7,8 @@ res     = System.currentDirectory().."/resources"
 -- init stuff
 Graphics.init()
 dofile(res.."/gui-buttons.lua")
+System.createDirectory("/gridlauncher")
+System.createDirectory("/gridlauncher/titlebanners")
 
 function exit()
     System.exit()
@@ -76,7 +78,7 @@ function doDraw(drawfunc, tid)
     drawfunc()
     Screen.flip()
     local pad = Controls.read()
-    if Controls.check(pad, KEY_SELECT) or tid then
+    if Controls.check(pad, KEY_SELECT) then
         System.takeScreenshot(System.currentDirectory().."/scr-"..getTimeDateFormatted()..".bmp")
     end
 end
@@ -161,12 +163,16 @@ repeat
     elseif state == exit_btn then exit() end
 until continue
 
+progress = 0
+downloaded = 0
 doDraw(function()
     print(5, 50, "Downloading game covers, sit tight!", c_black, TOP_SCREEN)
-    print(5, 70, "0 / "..total, c_black, TOP_SCREEN)
-    print(5, 105, "Hold Y to stop.", c_black, TOP_SCREEN)
+    print(5, 70, progress.." / "..total, c_black, TOP_SCREEN)
+    print(5, 90, "Game ID:", c_black, TOP_SCREEN)
+    print(5, 105, "Title:", c_black, TOP_SCREEN)
+    print(5, 120, "TID: ", c_black, TOP_SCREEN)
+    print(5, 140, "Hold Y to stop.", c_black, TOP_SCREEN)
 end)
-progress = 0
 for k, v in pairs(titles_to_download) do
     --error(tostring(k)..":"..tostring(v[1])..":"..tostring(v[2]))
     local status, _ = pcall(function()
@@ -175,19 +181,24 @@ for k, v in pairs(titles_to_download) do
     end)
     progress = progress + 1
     if status then
+        downloaded = downloaded + 1
         doDraw(function()
             print(5, 50, "Downloading game covers, sit tight!", c_black, TOP_SCREEN)
             print(5, 70, progress.." / "..total, c_black, TOP_SCREEN)
-            print(5, 85, k.." - "..v[1], c_black, TOP_SCREEN)
-            print(5, 105, "Hold Y to stop.", c_black, TOP_SCREEN)
+            print(5, 90, "Game ID: "..k, c_black, TOP_SCREEN)
+            print(5, 105, "Title: "..v[1], c_black, TOP_SCREEN)
+            print(5, 120, "TID: "..v[2], c_black, TOP_SCREEN)
+            print(5, 140, "Hold Y to stop.", c_black, TOP_SCREEN)
         end, v[2])
     else
         doDraw(function()
             print(5, 50, "Downloading game covers, sit tight!", c_black, TOP_SCREEN)
             print(5, 70, progress.." / "..total, c_black, TOP_SCREEN)
-            print(5, 85, k.." - "..v[1], c_black, TOP_SCREEN)
-            print(5, 105, "Hold Y to stop.", c_black, TOP_SCREEN)
-            print(5, 125, "No cover exists for this yet :(", c_black, TOP_SCREEN)
+            print(5, 90, "Game ID: "..k, c_black, TOP_SCREEN)
+            print(5, 105, "Title: "..v[1], c_black, TOP_SCREEN)
+            print(5, 120, "TID: "..v[2], c_black, TOP_SCREEN)
+            print(5, 140, "Hold Y to stop.", c_black, TOP_SCREEN)
+            print(5, 160, "No cover exists for this yet :(", c_black, TOP_SCREEN)
         end)
     end
     if Controls.check(Controls.read(), KEY_Y) then break end
@@ -201,7 +212,8 @@ while true do
         else
             print(5, 50, "Stopped.", c_black, TOP_SCREEN)
         end
-        print(5, 70, total.." / "..total, c_black, TOP_SCREEN)
+        print(5, 70, progress.." / "..total, c_black, TOP_SCREEN)
+        print(5, 90, "Downloaded "..downloaded.." covers.", c_black, TOP_SCREEN)
         Button.draw()
     end)
     local state = Button.checkClick()
