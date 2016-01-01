@@ -145,8 +145,8 @@ total = 0
 Button.setButtonList({download_missing_btn, download_all_btn, exit_btn})
 repeat
     doDraw(function()
-        print(6, 50, "You are missing "..need_l.." covers.", c_black, TOP_SCREEN)
-        print(6, 50, "You are missing "..need_l.." covers.", c_black, TOP_SCREEN)
+        print(6, 50, "There are "..all_l.." covers you can get.", c_black, TOP_SCREEN)
+        print(6, 65, "You are missing "..need_l.." covers.", c_black, TOP_SCREEN)
         Button.draw()
     end)
     local state = Button.checkClick()

@@ -117,7 +117,7 @@ function Button.draw()
                 Screen.debugPrint(buttons[v][1] + buttons[v][6],
                     buttons[v][2] + buttons[v][7] + 1,
                     "("..buttons[v][10]..")",
-                    c_grey,
+                    c_dark_grey,
                     buttons[v][8])
             end
         else
