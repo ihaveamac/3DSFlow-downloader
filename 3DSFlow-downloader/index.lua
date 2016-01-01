@@ -95,8 +95,6 @@ repeat
         print(6, 85, "your installed games from GameTDB.", c_black, TOP_SCREEN)
         print(6, 105, "This requires you have mashers's grid", c_black, TOP_SCREEN)
         print(6, 120, "launcher beta 132 or higher.", c_black, TOP_SCREEN)
-        print(6, 160, "last_btn: "..tostring(last_btn), c_black, TOP_SCREEN)
-        print(6, 175, "Button.checkTouch(): "..tostring(Button.checkTouch()), c_black, TOP_SCREEN)
         Button.draw()
     end)
     local state = Button.checkClick()
