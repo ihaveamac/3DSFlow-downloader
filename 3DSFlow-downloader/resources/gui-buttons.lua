@@ -6,7 +6,36 @@
 -- To change this template use File | Settings | File Templates.
 --
 
-buttons = {}
+-- due to weird technical reasons, this has to be duplicated
+-- local functions, this increases performance
+local fprint         = Font.print
+local sprint         = Screen.debugPrint
+local sclear         = Screen.clear
+local sflip          = Screen.flip
+local svblank        = Screen.waitVblankStart
+local srefresh       = Screen.refresh
+local gdrawpartimage = Graphics.drawPartialImage
+local ginitblend     = Graphics.initBlend
+local gtermblend     = Graphics.termBlend
+local gloadimage     = Graphics.loadImage
+local gdrawimage     = Graphics.drawImage
+local gfreeimage     = Graphics.freeImage
+local color          = Color.new
+local ccheck         = Controls.check
+local cread          = Controls.read
+local creadtouch     = Controls.readTouch
+local ndownload      = Network.downloadFile
+local nstring        = Network.requestString
+
+-- colors
+local c_white           = color(255, 255, 255)
+local c_very_light_grey = color(223, 223, 223)
+local c_light_grey      = color(191, 191, 191)
+local c_grey            = color(127, 127, 127)
+local c_dark_grey       = color(63, 63, 63)
+local c_black           = color(0, 0, 0)
+
+local buttons = {}
 --  1: x position
 --  2: y position
 --  3: width
@@ -17,8 +46,8 @@ buttons = {}
 --  8: screen
 --  9: button variable
 -- 10: button text
-last_btn = false
-current_btns = {}
+local last_btn = false
+local current_btns = {}
 
 Button = {}
 
@@ -43,14 +72,14 @@ function Button.setButtonList(list)
 end
 
 function Button.checkClick()
-    local pad = Controls.read()
-    if Controls.check(pad, KEY_TOUCH) then
+    local pad = cread()
+    if ccheck(pad, KEY_TOUCH) then
         Button.checkTouch()
         return false
     else
         for _, v in pairs(current_btns) do
             if buttons[v][9] then
-                if Controls.check(pad, buttons[v][9]) then
+                if ccheck(pad, buttons[v][9]) then
                     Button.checkTouch()
                     return false
                 end
@@ -66,13 +95,13 @@ function Button.checkClick()
 end
 
 function Button.checkTouch()
-    local pad = Controls.read()
-    --[[if not Controls.check(pad, KEY_TOUCH) then
+    local pad = cread()
+    --[[if not ccheck(pad, KEY_TOUCH) then
         return false
     end]]
-    local tx, ty = Controls.readTouch()
+    local tx, ty = creadtouch()
     for _, v in pairs(current_btns) do
-        if Controls.check(pad, KEY_TOUCH) then
+        if ccheck(pad, KEY_TOUCH) then
             if tx >= buttons[v][1] and tx <= buttons[v][1] + buttons[v][3] and ty >= buttons[v][2] and ty <= buttons[v][2] + buttons[v][4] then
                 last_btn = v
                 return v
@@ -80,7 +109,7 @@ function Button.checkTouch()
                 last_btn = false
             end
         elseif buttons[v][9] then
-            if Controls.check(pad, buttons[v][9]) then
+            if ccheck(pad, buttons[v][9]) then
                 last_btn = v
                 return v
             end
@@ -108,13 +137,13 @@ function Button.draw()
                 buttons[v][2] + buttons[v][4],
                 c_dark_grey,
                 buttons[v][8])
-            Screen.debugPrint(buttons[v][1] + buttons[v][6],
+            sprint(buttons[v][1] + buttons[v][6],
                 buttons[v][2] + buttons[v][7] + 1,
                 t,
                 c_black,
                 buttons[v][8])
             if buttons[v][10] then
-                Screen.debugPrint(buttons[v][1] + buttons[v][6],
+                sprint(buttons[v][1] + buttons[v][6],
                     buttons[v][2] + buttons[v][7] + 1,
                     "("..buttons[v][10]..")",
                     c_dark_grey,
@@ -145,7 +174,7 @@ function Button.draw()
                 c_dark_grey,
                 buttons[v][8])
             if buttons[v][10] then
-                Screen.debugPrint(buttons[v][1] + buttons[v][6],
+                sprint(buttons[v][1] + buttons[v][6],
                     buttons[v][2] + buttons[v][7],
                     "("..buttons[v][10]..")",
                     c_grey,

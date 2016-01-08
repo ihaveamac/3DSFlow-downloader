@@ -1,14 +1,44 @@
 --ihaveamac--
 -- https://github.com/ihaveamac/3DSFlow-downloader
-version = "dev"
-db_list = "http://www.gametdb.com/3dstdb.txt?LANG=ORIG"
-res     = System.currentDirectory().."/resources"
+local version = "dev"
+local db_list = "http://www.gametdb.com/3dstdb.txt?LANG=ORIG"
+local res     = System.currentDirectory().."/resources"
+
+-- get model and stuff
+local sys_t = {"Nintendo 3DS", "Nintendo 3DS XL", "New Nintendo 3DS", "Nintendo 2DS", "New Nintendo 3DS XL" }
+-- http://3dbrew.org/wiki/Cfg:GetSystemModel
+local model = sys_t[System.getModel() + 1]
+
+local region = "JPN/Other"
+local region_num = System.getRegion()
+if     region_num == 1 then region = "USA"
+elseif region_num == 2 then region = "EUR" end
 
 -- init stuff
 Graphics.init()
 dofile(res.."/gui-buttons.lua")
 System.createDirectory("/gridlauncher")
 System.createDirectory("/gridlauncher/titlebanners")
+
+-- local functions, this increases performance
+local fprint         = Font.print
+local sprint         = Screen.debugPrint
+local sclear         = Screen.clear
+local sflip          = Screen.flip
+local svblank        = Screen.waitVblankStart
+local srefresh       = Screen.refresh
+local gdrawpartimage = Graphics.drawPartialImage
+local ginitblend     = Graphics.initBlend
+local gtermblend     = Graphics.termBlend
+local gloadimage     = Graphics.loadImage
+local gdrawimage     = Graphics.drawImage
+local gfreeimage     = Graphics.freeImage
+local color          = Color.new
+local ccheck         = Controls.check
+local cread          = Controls.read
+local creadtouch     = Controls.readTouch
+local ndownload      = Network.downloadFile
+local nstring        = Network.requestString
 
 function exit()
     System.exit()
@@ -22,73 +52,86 @@ function getTimeDateFormatted()
     return yr.."-"..mp.."-"..dy.."_"..hr.."-"..mi.."-"..sc
 end
 
+--- Returns HEX representation of num
+function num2hex(num)
+    local hexstr = '0123456789abcdef'
+    local s = ''
+    while num > 0 do
+        local mod = math.fmod(num, 16)
+        s = string.sub(hexstr, mod+1, mod+1) .. s
+        num = math.floor(num / 16)
+    end
+    if s == '' then s = '0' end
+    return s
+end
+
 -- colors
-c_white           = Color.new(255, 255, 255)
-c_very_light_grey = Color.new(223, 223, 223)
-c_light_grey      = Color.new(191, 191, 191)
-c_grey            = Color.new(127, 127, 127)
-c_dark_grey       = Color.new(63, 63, 63)
-c_black           = Color.new(0, 0, 0)
+local c_white           = color(255, 255, 255)
+local c_very_light_grey = color(223, 223, 223)
+local c_light_grey      = color(191, 191, 191)
+local c_grey            = color(127, 127, 127)
+local c_dark_grey       = color(63, 63, 63)
+local c_black           = color(0, 0, 0)
 
 -- logo
-logo = Graphics.loadImage(res.."/logo.png")
-bg   = Graphics.loadImage(res.."/bg.png")
+local logo = gloadimage(res.."/logo.png")
+local bg   = gloadimage(res.."/bg.png")
 
 -- fonts
-font_title      = Font.load(res.."/font.ttf")
-font_title_bold = Font.load(res.."/font-bold.ttf")
+local font_title      = Font.load(res.."/font.ttf")
+local font_title_bold = Font.load(res.."/font-bold.ttf")
 Font.setPixelSizes(font_title, 25)
 Font.setPixelSizes(font_title_bold, 25)
 
 -- counter visual glitch
-Screen.waitVblankStart()
-Screen.refresh()
-Screen.clear(TOP_SCREEN)
-Screen.clear(BOTTOM_SCREEN)
-Screen.flip()
+svblank()
+srefresh()
+sclear(TOP_SCREEN)
+sclear(BOTTOM_SCREEN)
+sflip()
 
 function print(x, y, t, c, s)
-    Screen.debugPrint(x+1, y+1, t, c_light_grey, s)
-    Screen.debugPrint(x, y, t, c, s)
+    sprint(x+1, y+1, t, c_light_grey, s)
+    sprint(x, y, t, c, s)
 end
 
 function doDraw(drawfunc, tid)
-    Screen.waitVblankStart()
-    Screen.refresh()
-    Screen.clear(TOP_SCREEN)
-    Screen.clear(BOTTOM_SCREEN)
-    Graphics.initBlend(TOP_SCREEN)
-    Graphics.drawPartialImage(0, 0, 0, 0, 400, 240, bg)
-    Graphics.drawPartialImage(5, 5, 0, 0, 128, 45, logo)
+    svblank()
+    srefresh()
+    sclear(TOP_SCREEN)
+    sclear(BOTTOM_SCREEN)
+    ginitblend(TOP_SCREEN)
+    gdrawpartimage(0, 0, 0, 0, 400, 240, bg)
+    gdrawpartimage(5, 5, 0, 0, 128, 45, logo)
     -- Graphics.drawLine is doing something weird...
     --Graphics.fillRect(6, 394, 46, 47, c_dark_grey)
     --Graphics.fillRect(6, 394, 47, 48, c_grey)
-    Graphics.termBlend()
-    Graphics.initBlend(BOTTOM_SCREEN)
-    Graphics.drawPartialImage(0, 0, 40, 240, 320, 240, bg)
+    gtermblend()
+    ginitblend(BOTTOM_SCREEN)
+    gdrawpartimage(0, 0, 40, 240, 320, 240, bg)
     if tid then
-        local img = Graphics.loadImage("/gridlauncher/titlebanners/"..tid.."-banner-fullscreen.png")
-        Graphics.drawImage(40, 18, img)
-        Graphics.freeImage(img)
+        local img = gloadimage("/gridlauncher/titlebanners/"..tid.."-banner-fullscreen.png")
+        gdrawimage(40, 18, img)
+        gfreeimage(img)
     end
-    Graphics.termBlend()
-    Font.print(font_title_bold, 140, 3, "Cover", c_black, TOP_SCREEN)
-    Font.print(font_title_bold, 140, 21, "Downloader", c_black, TOP_SCREEN)
-    Font.print(font_title, 264, 21, version, c_grey, TOP_SCREEN)
+    gtermblend()
+    fprint(font_title_bold, 140, 3, "Cover", c_black, TOP_SCREEN)
+    fprint(font_title_bold, 140, 21, "Downloader", c_black, TOP_SCREEN)
+    fprint(font_title, 264, 21, version, c_grey, TOP_SCREEN)
     drawfunc()
-    Screen.flip()
-    local pad = Controls.read()
-    if Controls.check(pad, KEY_SELECT) then
+    sflip()
+    local pad = cread()
+    if ccheck(pad, KEY_SELECT) then
         System.takeScreenshot(System.currentDirectory().."/scr-"..getTimeDateFormatted()..".bmp")
     end
 end
 
 -- Button.new(x, y, width, height, text, text x offset, text y offset, font, screen[, color])
-get_covers_list_btn = Button.new(20, 20, 280, 30, "Get list of covers", 10, 10, BOTTOM_SCREEN, KEY_A, "A")
-exit_btn            = Button.new(20, 190, 280, 30, "Exit", 10, 10, BOTTOM_SCREEN, KEY_B, "B")
+local get_covers_list_btn = Button.new(20, 20, 280, 30, "Get list of covers", 10, 10, BOTTOM_SCREEN, KEY_A, "A")
+local exit_btn            = Button.new(20, 190, 280, 30, "Exit", 10, 10, BOTTOM_SCREEN, KEY_B, "B")
 
---local title_img_s = Screen.createImage(400, 240, Color.new(0, 0, 0, 0))
-continue = false
+--local title_img_s = Screen.createImage(400, 240, color(0, 0, 0, 0))
+local continue = false
 Button.setButtonList({get_covers_list_btn, exit_btn})
 repeat
     doDraw(function()
@@ -108,19 +151,22 @@ doDraw(function()
     print(6, 50, "Getting list of title IDs from GameTDB...", c_black, TOP_SCREEN)
 end)
 
-titles = {}
-all    = {}
-all_l  = 0
-needed = {}
-need_l = 0
-for v in string.gmatch(Network.requestString(db_list), '([^\n]+)') do
+local titles = {}
+local all    = {}
+local all_l  = 0
+local needed = {}
+local need_l = 0
+
+missing_titles = ""
+missing_covers = ""
+for v in string.gmatch(nstring(db_list), '([^\n]+)') do
     if v:sub(1, 6) ~= "TITLES" then
         titles[v:sub(1, 4)] = {v:sub(8), "BAD-TITLE-ID"}
     end
 end
 cialist = System.listCIA()
 for _, v in pairs(cialist) do
-    if v.category == 0 and (v.product_id:sub(1, 4) == "CTR-" or v.product_id:sub(1, 4) == "KTR-") and #v.product_id == 10 and v.mediatype == 1 and titles[v.product_id:sub(7)] then
+    if v.category == 0 and (v.product_id:sub(1, 4) == "CTR-" or v.product_id:sub(1, 4) == "KTR-") and #v.product_id == 10 and v.mediatype == 1 then
         -- only Applications
         -- "CTR-X-YYYY" is 10 chars ("CTR-X-YYYY-00" is DLC I think)
         -- "KTR-" is used for New3DS-only titles
@@ -128,22 +174,27 @@ for _, v in pairs(cialist) do
 
         -- note that "title_id" is only available in my lpp-3ds mod
         local tid = string.format("%.0f",v.title_id)
-        all_l = all_l + 1
-        titles[v.product_id:sub(7)][2] = tid
-        all[v.product_id:sub(7)] = titles[v.product_id:sub(7)]
-        if not System.doesFileExist("/gridlauncher/titlebanners/"..tid.."-banner-fullscreen.png") then
-            need_l = need_l + 1
-            needed[v.product_id:sub(7)] = titles[v.product_id:sub(7)]
+        if titles[v.product_id:sub(7)] then
+            all_l = all_l + 1
+            titles[v.product_id:sub(7)][2] = tid
+            titles[v.product_id:sub(7)][3] = num2hex(v.title_id)
+            all[v.product_id:sub(7)] = titles[v.product_id:sub(7)]
+            if not System.doesFileExist("/gridlauncher/titlebanners/"..tid.."-banner-fullscreen.png") then
+                need_l = need_l + 1
+                needed[v.product_id:sub(7)] = titles[v.product_id:sub(7)]
+            end
+        else
+            missing_titles = missing_titles.."\n| "..v.product_id.." | "..tid.." | 000"..num2hex(v.title_id)
         end
     end
 end
 
-download_missing_btn = Button.new(20, 20, 280, 30, "Download missing "..need_l, 10, 10, BOTTOM_SCREEN, KEY_A, "A")
-download_all_btn     = Button.new(20, 60, 280, 30, "Download all "..all_l, 10, 10, BOTTOM_SCREEN, KEY_X, "X")
+local download_missing_btn = Button.new(20, 20, 280, 30, "Download missing "..need_l, 10, 10, BOTTOM_SCREEN, KEY_A, "A")
+local download_all_btn     = Button.new(20, 60, 280, 30, "Download all "..all_l, 10, 10, BOTTOM_SCREEN, KEY_X, "X")
 
 continue = false
-titles_to_download = {}
-total = 0
+local titles_to_download = {}
+local total = 0
 Button.setButtonList({download_missing_btn, download_all_btn, exit_btn})
 repeat
     doDraw(function()
@@ -163,8 +214,8 @@ repeat
     elseif state == exit_btn then exit() end
 until continue
 
-progress = 0
-downloaded = 0
+local progress = 0
+local downloaded = 0
 doDraw(function()
     print(5, 50, "Downloading game covers, sit tight!", c_black, TOP_SCREEN)
     print(5, 70, progress.." / "..total, c_black, TOP_SCREEN)
@@ -176,8 +227,8 @@ end)
 for k, v in pairs(titles_to_download) do
     --error(tostring(k)..":"..tostring(v[1])..":"..tostring(v[2]))
     local status, _ = pcall(function()
-        Network.downloadFile("http://art.gametdb.com/3ds/box/US/"..k..".png", "/gridlauncher/titlebanners/"..v[2].."-banner-fullscreen.png")
-        --Network.requestString("http://art.gametdb.com/3ds/box/US/"..k..".png")
+        ndownload("http://art.gametdb.com/3ds/box/US/"..k..".png", "/gridlauncher/titlebanners/"..v[2].."-banner-fullscreen.png")
+        --nstring("http://art.gametdb.com/3ds/box/US/"..k..".png")
     end)
     progress = progress + 1
     if status then
@@ -200,10 +251,35 @@ for k, v in pairs(titles_to_download) do
             print(5, 140, "Hold Y to stop.", c_black, TOP_SCREEN)
             print(5, 160, "No cover exists for this yet :(", c_black, TOP_SCREEN)
         end)
+        missing_covers = missing_covers.."\n|  "..k.."  | "..v[2].." | 000"..v[3].." | "..v[1]
     end
-    if Controls.check(Controls.read(), KEY_Y) then break end
+    if ccheck(cread(), KEY_Y) then break end
 end
-
+local log_file_location = "missing-"..getTimeDateFormatted()..".log"
+local log =   "  Missing titles & covers from GameTDB\n"..
+        "--------------------------------\n"..
+        "- Missing titles\n"..
+        "\n"..
+        "  NOTE: If you are using Homebrew in .CIA format, some of them might show up in\n"..
+        "  this list (for example, CHMM uses \"CTR-P-CHMM\" and BootNTR uses \"CTR-P-BNTR\").\n"..
+        "  Please note which ones do this before you report a missing title.\n"..
+        "\n".. -- just for organization...
+        "| GameID     | TitleID (DEC)    | TitleID (HEX)\n"..
+        "|------------|------------------|------------------"..
+        missing_titles.."\n"..
+        "--------------------------------------------------\n"..
+        "- Missing covers\n"..
+        "\n"..
+        "| GameID | TitleID (DEC)    | TitleID (HEX)    | GameName\n"..
+        "|--------|------------------|------------------|----------"..
+        missing_covers.."\n"..
+        "---------------------------------------------------------\n"..
+        "Downloader version: "..version.."\n"..
+        "Console model:      "..model.."\n"..
+        "Console region:     "..region
+local log_file = io.open(System.currentDirectory().."/"..log_file_location, FCREATE)
+io.write(log_file, 0, log, #log)
+io.close(log_file)
 Button.setButtonList({exit_btn})
 while true do
     doDraw(function()
@@ -214,6 +290,13 @@ while true do
         end
         print(5, 70, progress.." / "..total, c_black, TOP_SCREEN)
         print(5, 90, "Downloaded "..downloaded.." covers.", c_black, TOP_SCREEN)
+        if #missing_titles > 0 or #missing_covers > 0 then
+            print(5, 110, "Some titles didn't exist on GameTDB or didn't", c_black, TOP_SCREEN)
+            print(5, 125, "have covers. A log containing what is missing", c_black, TOP_SCREEN)
+            print(5, 140, "has been saved to:", c_black, TOP_SCREEN)
+            print(5, 160, System.currentDirectory().."/", c_black, TOP_SCREEN)
+            print(5, 175, log_file_location, c_black, TOP_SCREEN)
+        end
         Button.draw()
     end)
     local state = Button.checkClick()
