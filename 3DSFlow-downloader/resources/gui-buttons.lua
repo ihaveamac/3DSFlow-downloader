@@ -8,29 +8,31 @@
 
 -- due to weird technical reasons, this has to be duplicated
 -- local functions, this increases performance
-local fprint         = Font.print
+--local fload          = Font.load
+--local funload        = Font.unload
+--local fprint         = Font.print
 local sprint         = Screen.debugPrint
-local sclear         = Screen.clear
-local sflip          = Screen.flip
-local svblank        = Screen.waitVblankStart
-local srefresh       = Screen.refresh
-local gdrawpartimage = Graphics.drawPartialImage
-local ginitblend     = Graphics.initBlend
-local gtermblend     = Graphics.termBlend
-local gloadimage     = Graphics.loadImage
-local gdrawimage     = Graphics.drawImage
-local gfreeimage     = Graphics.freeImage
+--local sclear         = Screen.clear
+--local sflip          = Screen.flip
+--local svblank        = Screen.waitVblankStart
+--local srefresh       = Screen.refresh
+--local gdrawpartimage = Graphics.drawPartialImage
+--local ginitblend     = Graphics.initBlend
+--local gtermblend     = Graphics.termBlend
+--local gloadimage     = Graphics.loadImage
+--local gdrawimage     = Graphics.drawImage
+--local gfreeimage     = Graphics.freeImage
 local color          = Color.new
 local ccheck         = Controls.check
 local cread          = Controls.read
 local creadtouch     = Controls.readTouch
-local ndownload      = Network.downloadFile
-local nstring        = Network.requestString
+--local ndownload      = Network.downloadFile
+--local nstring        = Network.requestString
 
 -- colors
 local c_white           = color(255, 255, 255)
 local c_very_light_grey = color(223, 223, 223)
-local c_light_grey      = color(191, 191, 191)
+--local c_light_grey      = color(191, 191, 191)
 local c_grey            = color(127, 127, 127)
 local c_dark_grey       = color(63, 63, 63)
 local c_black           = color(0, 0, 0)
