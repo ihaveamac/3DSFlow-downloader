@@ -1,12 +1,12 @@
 --ihaveamac--
 -- https://github.com/ihaveamac/3DSFlow-downloader
-version       = "dev"
+version       = "dev6"
 db_list       = "http://www.gametdb.com/3dstdb.txt?LANG=ORIG"
 res           = System.currentDirectory().."/resources"
 settings_path = System.currentDirectory().."/settings.cfg"
 
 -- get model and stuff
-sys_t = {"Nintendo 3DS", "Nintendo 3DS XL", "New Nintendo 3DS", "Nintendo 2DS", "New Nintendo 3DS XL" }
+sys_t = {"Nintendo 3DS", "Nintendo 3DS XL", "New Nintendo 3DS", "Nintendo 2DS", "New Nintendo 3DS XL"}
 -- http://3dbrew.org/wiki/Cfg:GetSystemModel
 model = sys_t[System.getModel() + 1]
 
@@ -39,9 +39,12 @@ eur_cover_regions = {
     I noticed that game product codes (CTR-X-XXXX) end in something that determines the region:
     - "E" is USA (so "US")
     - "J" is JPN (so "JP")
-    - "P" and "Z" are EUR (so any of the above)
+    - "P" are EUR (so any of the above)
     - "A" is region-free, which might only apply to eShop content (e.g. ORAS special demo, or digital Pokémon XYORAS?)
       in this case, determine cover based on console region + preferred region if EUR
+    - "Z" appears mostly with EUR, but I was told it also appears with some USA games, so treating it as "A"
+    - "W" is Taiwan (so "ZH")
+    - "R" is Russia, which is odd, apparently some games have a Russia-specific code separate from EUR
 
       these are the only ones I found. but if there's more, I'm going to assume EUR for now
  ]]
@@ -128,8 +131,7 @@ function getTimeDateFormatted()
     if hr < 10 then hr = "0"..hr end
     if mi < 10 then mi = "0"..mi end
     if sc < 10 then sc = "0"..sc end
-    --noinspection UnusedDef
-    local dw, dy, mo, yr = System.getDate()
+    local _, dy, mo, yr = System.getDate()
     if mo < 10 then mo = "0"..mo end
     if dy < 10 then dy = "0"..dy end
     return yr.."-"..mo.."-"..dy.."_"..hr.."-"..mi.."-"..sc
@@ -261,7 +263,7 @@ repeat
         print(6, 70, "This will let you download cover banners for", c_black, TOP_SCREEN)
         print(6, 85, "your installed games from GameTDB.", c_black, TOP_SCREEN)
         print(6, 105, "This requires you have mashers's grid", c_black, TOP_SCREEN)
-        print(6, 120, "launcher beta 132 or higher."..tostring(isIgnored("CTR-P-AQNE")), c_black, TOP_SCREEN)
+        print(6, 120, "launcher beta 132 or higher.", c_black, TOP_SCREEN)
         print(30, 100, "Current preference:", c_dark_grey, BOTTOM_SCREEN)
         print(30, 115, eur_cover_regions[eur_cover_region_option][2], c_dark_grey, BOTTOM_SCREEN)
         Button.draw()
@@ -358,7 +360,14 @@ for k, v in pairs(titles_to_download) do
         cover_region = "US"
     elseif k:sub(4) == "J" then
         cover_region = "JP"
-    elseif k:sub(4) == "A" then
+    elseif k:sub(4) == "K" then
+        cover_region = "KO"
+    elseif k:sub(4) == "W" then
+        cover_region = "ZH"
+    elseif k:sub(4) == "R" then
+        cover_region = "RU"
+    elseif k:sub(4) == "A" or k:sub(4) == "Z" then
+        -- apparently Z is used for some non-EUR games as well
         if region_num == 1 then -- USA console
             cover_region = "US"
         elseif region_num == 2 then
@@ -369,14 +378,14 @@ for k, v in pairs(titles_to_download) do
     else
         cover_region = eur_cover_regions[eur_cover_region_option][1]
     end
-    local is_eur = (cover_region ~= "US" and cover_region ~= "JP" and cover_region ~= "EN")
+    local try_en_on_fail = (cover_region ~= "US" and cover_region ~= "JP" and cover_region ~= "EN")
     -- this contains "EN" so it won't try it twice if it fails
     System.deleteFile("/gridlauncher/titlebanners/"..v[2].."-banner-fullscreen.png")
     local status
     status = pcall(function()
         ndownload("http://art.gametdb.com/3ds/box/"..cover_region.."/"..k..".png", "/gridlauncher/titlebanners/"..v[2].."-banner-fullscreen.png")
     end)
-    if is_eur and not status then
+    if try_en_on_fail and not status then
         -- try England (EN) if region preference boxart fails
         status = pcall(function()
             ndownload("http://art.gametdb.com/3ds/box/EN/"..k..".png", "/gridlauncher/titlebanners/"..v[2].."-banner-fullscreen.png")
