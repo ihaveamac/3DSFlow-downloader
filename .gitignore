@@ -1,4 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+
+*.3dsx
+3DSFlow-downloader.zip
+
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
