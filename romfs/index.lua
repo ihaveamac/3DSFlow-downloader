@@ -1,9 +1,39 @@
 --ihaveamac--
 -- https://github.com/ihaveamac/3DSFlow-downloader
-version       = "dev6"
+version       = "beta1"
 db_list       = "http://www.gametdb.com/3dstdb.txt?LANG=ORIG"
 res           = "romfs:/resources"
-settings_path = System.currentDirectory().."/settings.cfg"
+curdir        = System.currentDirectory()
+settings_path = curdir.."/settings.cfg"
+
+-- local functions, this increases performance
+local fload          = Font.load
+local funload        = Font.unload
+local fprint         = Font.print
+local sprint         = Screen.debugPrint
+local sclear         = Screen.clear
+local sflip          = Screen.flip
+local svblank        = Screen.waitVblankStart
+local srefresh       = Screen.refresh
+local gdrawpartimage = Graphics.drawPartialImage
+local ginitblend     = Graphics.initBlend
+local gtermblend     = Graphics.termBlend
+local gloadimage     = Graphics.loadImage
+local gdrawimage     = Graphics.drawImage
+local gfreeimage     = Graphics.freeImage
+local color          = Color.new
+local ccheck         = Controls.check
+local cread          = Controls.read
+local creadtouch     = Controls.readTouch
+local ndownload      = Network.downloadFile
+local nstring        = Network.requestString
+
+-- counter visual glitch
+svblank()
+srefresh()
+sclear(TOP_SCREEN)
+sclear(BOTTOM_SCREEN)
+sflip()
 
 -- get model and stuff
 sys_t = {"Nintendo 3DS", "Nintendo 3DS XL", "New Nintendo 3DS", "Nintendo 2DS", "New Nintendo 3DS XL"}
@@ -93,29 +123,11 @@ Graphics.init()
 dofile(res.."/gui-buttons.lua")
 System.createDirectory("/gridlauncher")
 System.createDirectory("/gridlauncher/titlebanners")
-System.createDirectory(System.currentDirectory().."/logs")
-
--- local functions, this increases performance
-local fload          = Font.load
-local funload        = Font.unload
-local fprint         = Font.print
-local sprint         = Screen.debugPrint
-local sclear         = Screen.clear
-local sflip          = Screen.flip
-local svblank        = Screen.waitVblankStart
-local srefresh       = Screen.refresh
-local gdrawpartimage = Graphics.drawPartialImage
-local ginitblend     = Graphics.initBlend
-local gtermblend     = Graphics.termBlend
-local gloadimage     = Graphics.loadImage
-local gdrawimage     = Graphics.drawImage
-local gfreeimage     = Graphics.freeImage
-local color          = Color.new
-local ccheck         = Controls.check
-local cread          = Controls.read
-local creadtouch     = Controls.readTouch
-local ndownload      = Network.downloadFile
-local nstring        = Network.requestString
+if curdir:sub(-1) == "/" then
+    System.currentDirectory(curdir:sub(1, -2))
+    curdir = System.currentDirectory()
+end
+System.createDirectory(curdir.."/logs")
 
 function exit()
     gfreeimage(logo)
@@ -168,13 +180,6 @@ font_title_bold = fload(res.."/font-bold.ttf")
 Font.setPixelSizes(font_title, 25)
 Font.setPixelSizes(font_title_bold, 25)
 
--- counter visual glitch
-svblank()
-srefresh()
-sclear(TOP_SCREEN)
-sclear(BOTTOM_SCREEN)
-sflip()
-
 function print(x, y, t, c, s)
     sprint(x+1, y+1, t, c_light_grey, s)
     sprint(x, y, t, c, s)
@@ -207,7 +212,7 @@ function doDraw(drawfunc, tid)
     sflip()
     local pad = cread()
     if ccheck(pad, KEY_SELECT) then
-        System.takeScreenshot(System.currentDirectory().."/scr-"..getTimeDateFormatted()..".bmp")
+        System.takeScreenshot(curdir.."/scr-"..getTimeDateFormatted()..".bmp")
     end
 end
 
@@ -442,7 +447,7 @@ local log =
         "Europe cover region pref: "..eur_cover_regions[eur_cover_region_option][1].."/"..eur_cover_regions[eur_cover_region_option][2].."\n"..
         "Console model:            "..model.."\n"..
         "Console region:           "..region
-log_file = io.open(System.currentDirectory().."/logs/"..log_file_location, FCREATE)
+log_file = io.open(curdir.."/logs/"..log_file_location, FCREATE)
 io.write(log_file, 0, log, #log)
 io.close(log_file)
 Button.setButtonList({exit_btn})
@@ -459,7 +464,7 @@ while true do
             print(5, 110, "Some titles didn't exist on GameTDB or didn't", c_black, TOP_SCREEN)
             print(5, 125, "have covers. A log containing what is missing", c_black, TOP_SCREEN)
             print(5, 140, "has been saved to:", c_black, TOP_SCREEN)
-            print(5, 160, System.currentDirectory().."/logs/", c_black, TOP_SCREEN)
+            print(5, 160, curdir.."/logs/", c_black, TOP_SCREEN)
             print(5, 175, log_file_location, c_black, TOP_SCREEN)
         end
         Button.draw()
